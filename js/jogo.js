@@ -243,13 +243,16 @@ function desenhar() {
   const g = E.g, at = E.pos, D = E.destaque, ids = new Set(D ? D.ids : []), arD = new Set();
   if (D && D.tipo !== 'regiao') D.ids.forEach((v, i) => { const w = D.ids[i + 1]; if (w) { arD.add(v + '|' + w); arD.add(w + '|' + v); } });
   const viz = new Set(g.vizinhos(at).map(v => v.to));
-  let s = '<defs><marker id="seta" markerWidth="8" markerHeight="8" refX="30" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#2b1b44"/></marker></defs>';
+  let s = '<defs><marker id="seta" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#2b1b44"/></marker></defs>';
   for (const e of E.todasArestas) {
     if (!g.vertices.has(e.a) || !g.vertices.has(e.b)) continue;   // aresta de vértice colapsado some
     const A = E.base[e.a], B = E.base[e.b];
+    const dx = B.x - A.x, dy = B.y - A.y, distancia = Math.hypot(dx, dy), margem = 32;
+    const x1 = A.x + dx / distancia * margem, y1 = A.y + dy / distancia * margem;
+    const x2 = B.x - dx / distancia * margem, y2 = B.y - dy / distancia * margem;
     const poss = (e.a === at && viz.has(e.b)) || (!e.dirigida && e.b === at && viz.has(e.a));
     const cls = arD.has(e.a + '|' + e.b) ? 'ideal' : poss ? 'possivel' : '';
-    s += `<line class="aresta ${cls}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" ${e.dirigida ? 'marker-end="url(#seta)"' : ''}/>`;
+    s += `<line class="aresta ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${e.dirigida ? 'marker-end="url(#seta)"' : ''}/>`;
     if (poss) s += `<text class="custo" x="${(A.x + B.x) / 2}" y="${(A.y + B.y) / 2}">⛽${custo(e)}</text>`;
   }
   for (const c of Object.values(E.base)) {
@@ -259,10 +262,17 @@ function desenhar() {
     s += `<g class="${cl}" data-id="${c.id}" transform="translate(${c.x},${c.y})"><circle r="26" fill="transparent"/>
       <text class="emoji">${c.emoji}</text><text class="rot" y="36">${c.nome}</text></g>`;
     if (vivo && c.perigo?.tipo === 'piratas')
-      s += `<g transform="translate(${c.x},${c.y})"><g class="orbita rapida"><text x="34">☠️</text></g></g>`;
+      s += `<g transform="translate(${c.x},${c.y})"><g class="orbita rapida"><g>
+        <animateMotion path="M 34 0 A 34 34 0 1 1 -34 0 A 34 34 0 1 1 34 0" dur="2s" repeatCount="indefinite" rotate="0"/>
+        <text>☠️</text></g></g></g>`;
   }
   if (E.viajando) s += `<text id="nave-voo" class="nave" transform="translate(${E.navePos.x},${E.navePos.y})">${E.nave.emoji}</text>`;
-  else { const P = E.base[at]; s += `<g transform="translate(${P.x},${P.y})"><g class="orbita"><text x="-32">${E.nave.emoji}</text></g></g>`; }
+  else {
+    const P = E.base[at];
+    s += `<g transform="translate(${P.x},${P.y})"><g class="orbita nave-orbita">
+      <g><animateMotion path="M -32 0 A 32 32 0 1 1 32 0 A 32 32 0 1 1 -32 0" dur="4s" repeatCount="indefinite" rotate="0"/>
+      <text>${E.nave.emoji}</text></g></g></g>`;
+  }
   $('#mapa').innerHTML = s;
 }
 

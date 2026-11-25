@@ -35,9 +35,9 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .barra i { display: block; height: 100%; background: #1fba14; }
 .log { margin-top: 10px; border-top: 1px dashed #888; padding-top: 6px; font-weight: normal; }
 
-.aresta { stroke: #2b1b44; stroke-width: 1; opacity: .7; }
-.aresta.possivel { stroke: #cfcfcf; stroke-width: 2.5; stroke-dasharray: 6 5; opacity: 1; }
-.aresta.ideal { stroke: #ffe14d; stroke-width: 4; opacity: 1; stroke-dasharray: 10 6; filter: drop-shadow(0 0 5px #ffe14d); animation: fluxo 1s linear infinite; }
+.aresta { stroke: #2b1b44; stroke-width: 2; opacity: .7; }
+.aresta.possivel { stroke: #cfcfcf; stroke-width: 3.5; stroke-dasharray: 6 5; opacity: 1; }
+.aresta.ideal { stroke: #ffe14d; stroke-width: 4.5; opacity: 1; stroke-dasharray: 10 6; filter: drop-shadow(0 0 5px #ffe14d); animation: fluxo 1s linear infinite; }
 @keyframes fluxo { to { stroke-dashoffset: -32; } }
 .custo { font-size: 11px; text-anchor: middle; fill: #fff; paint-order: stroke; stroke: #2b1b44; stroke-width: 3px; }
 .no .emoji { font-size: 34px; text-anchor: middle; dominant-baseline: central; }
@@ -48,7 +48,8 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .no.fora { opacity: .3; }
 .rot { font-size: 11px; text-anchor: middle; fill: #1b1030; }
 .orbita { animation: gira 4s linear infinite; transform-origin: 0 0; pointer-events: none; }
-.orbita.rapida { animation-duration: 2s; animation-direction: reverse; }
+.orbita.nave-orbita { animation: none; }
+.orbita.rapida { animation: none; }
 @keyframes gira { to { transform: rotate(360deg); } }
 .orbita text, .nave { font-size: 20px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
 
@@ -58,4 +59,7 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .fim.ganhou h2 { color: #6dff8a; } .fim.perdeu h2 { color: #ff6d6d; }
 
 @media (max-width: 900px) { .jogo { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .orbita, .aresta.ideal { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .orbita, .aresta.ideal { animation: none; }
+  .orbita animateMotion { display: none; }
+}
