@@ -35,8 +35,8 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .barra i { display: block; height: 100%; background: #1fba14; }
 .log { margin-top: 10px; border-top: 1px dashed #888; padding-top: 6px; font-weight: normal; }
 
-.aresta { stroke: #2b1b44; stroke-width: 2; opacity: .7; }
-.aresta.possivel { stroke: #cfcfcf; stroke-width: 3.5; stroke-dasharray: 6 5; opacity: 1; }
+.aresta { stroke: #fff; stroke-width: 3.5; opacity: .2; }
+.aresta.possivel { stroke: #000; stroke-width: 3.5; stroke-dasharray: 6 5; opacity: 1; }
 .aresta.ideal { stroke: #ffe14d; stroke-width: 4.5; opacity: 1; stroke-dasharray: 10 6; filter: drop-shadow(0 0 5px #ffe14d); animation: fluxo 1s linear infinite; }
 @keyframes fluxo { to { stroke-dashoffset: -32; } }
 .custo { font-size: 11px; text-anchor: middle; fill: #fff; paint-order: stroke; stroke: #2b1b44; stroke-width: 3px; }
