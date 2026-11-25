@@ -1,0 +1,61 @@
+:root { --roxo: #5a3fa0; --azul: #0a2fff; --mapa: #9b7fb5; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; font-family: 'Courier New', monospace; font-weight: bold; color: #111;
+  /* Para usar seu wallpaper local: background: url(../assets/fundo.jpg) center/cover fixed; */
+  background: radial-gradient(circle at 25% 30%, #2a6ab8 0, #0b2a66 45%, #050f2e 100%) fixed;
+}
+.tela { display: none; min-height: 100vh; padding: 24px; flex-direction: column; align-items: center; gap: 20px; }
+.tela.ativa { display: flex; }
+#tela-inicio { justify-content: center; }
+.pilula { background: #ddd; border-radius: 18px; padding: 8px 36px; margin: 0; font-size: 2rem; text-align: center; max-width: 100%; }
+.grande { font: inherit; font-size: 2rem; border: 0; cursor: pointer; }
+.cards { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.card { background: #ddd; border: 2px solid var(--azul); border-radius: 10px; width: 250px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: .8rem; }
+.card h3 { margin: 0; background: #999; text-align: center; border-radius: 4px; padding: 2px; }
+.card .texto { flex: 1; min-height: 110px; }
+.card .icone { font-size: 2.4rem; text-align: center; }
+.card.sel { outline: 4px solid #ffe14d; }
+.btn { background: var(--azul); color: #fff; border: 0; border-radius: 4px; padding: 6px 12px; font: inherit; font-size: .8rem; cursor: pointer; }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn:focus-visible, .no:focus-visible { outline: 3px solid #ffe14d; }
+.pontos i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #999; margin-right: 2px; }
+.pontos i.on { background: #1fba14; }
+
+.jogo { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; width: 100%; max-width: 1250px; }
+#titulo-missao { font-size: 1.5rem; }
+#mapa { width: 100%; background: var(--mapa); border-radius: 8px; }
+aside { display: flex; flex-direction: column; gap: 16px; }
+.painel { border-radius: 16px; padding: 14px; font-size: .78rem; overflow: auto; }
+.painel.claro { background: #ddd; max-height: 310px; }
+.painel.escuro { background: #404040; color: #eee; }
+.painel hr { border: 0; border-top: 2px solid currentColor; margin: 6px 0 8px; }
+.painel .btn { margin: 2px 2px 2px 0; }
+.barra { background: #222; height: 10px; border-radius: 5px; margin: 4px 0 8px; overflow: hidden; }
+.barra i { display: block; height: 100%; background: #1fba14; }
+.log { margin-top: 10px; border-top: 1px dashed #888; padding-top: 6px; font-weight: normal; }
+
+.aresta { stroke: #2b1b44; stroke-width: 1; opacity: .7; }
+.aresta.possivel { stroke: #cfcfcf; stroke-width: 2.5; stroke-dasharray: 6 5; opacity: 1; }
+.aresta.ideal { stroke: #ffe14d; stroke-width: 4; opacity: 1; stroke-dasharray: 10 6; filter: drop-shadow(0 0 5px #ffe14d); animation: fluxo 1s linear infinite; }
+@keyframes fluxo { to { stroke-dashoffset: -32; } }
+.custo { font-size: 11px; text-anchor: middle; fill: #fff; paint-order: stroke; stroke: #2b1b44; stroke-width: 3px; }
+.no .emoji { font-size: 34px; text-anchor: middle; dominant-baseline: central; }
+.no.possivel { cursor: pointer; }
+.no.possivel .emoji { filter: drop-shadow(0 0 7px #fff); }
+.no.dest .emoji { filter: drop-shadow(0 0 9px #ffe14d); }
+.no.colapsado { opacity: .15; pointer-events: none; }
+.no.fora { opacity: .3; }
+.rot { font-size: 11px; text-anchor: middle; fill: #1b1030; }
+.orbita { animation: gira 4s linear infinite; transform-origin: 0 0; pointer-events: none; }
+.orbita.rapida { animation-duration: 2s; animation-direction: reverse; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.orbita text, .nave { font-size: 20px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+
+.fim { position: fixed; inset: 0; background: #000b; display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; color: #fff; text-align: center; padding: 20px; z-index: 5; }
+.fim.oculto { display: none; }
+.fim h2 { font-size: 2.4rem; margin: 0; }
+.fim.ganhou h2 { color: #6dff8a; } .fim.perdeu h2 { color: #ff6d6d; }
+
+@media (max-width: 900px) { .jogo { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .orbita, .aresta.ideal { animation: none; } }

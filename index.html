@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada Espacial — Grafos</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <section id="tela-inicio" class="tela ativa">
+    <h1 class="pilula">Jornada Espacial</h1>
+    <button class="pilula grande" id="btn-iniciar">iniciar</button>
+  </section>
+
+  <section id="tela-missoes" class="tela">
+    <h1 class="pilula">missões</h1>
+    <div class="cards" id="lista-missoes"></div>
+  </section>
+
+  <section id="tela-naves" class="tela">
+    <h1 class="pilula">naves</h1>
+    <div class="cards" id="lista-naves"></div>
+    <button class="btn grande" id="btn-comecar" disabled>começar</button>
+  </section>
+
+  <section id="tela-jogo" class="tela">
+    <h2 class="pilula" id="titulo-missao"></h2>
+    <div class="jogo">
+      <svg id="mapa" viewBox="0 0 800 500" role="img" aria-label="Mapa do universo"></svg>
+      <aside>
+        <div class="painel claro" id="info-corpo"></div>
+        <div class="painel escuro" id="info-nave"></div>
+      </aside>
+    </div>
+    <div id="fim" class="fim oculto"></div>
+  </section>
+
+  <!-- Scripts comuns (sem módulos), para funcionar abrindo o index.html direto -->
+  <script src="js/grafo.js"></script>
+  <script src="js/algoritmos.js"></script>
+  <script src="js/universo.js"></script>
+  <script src="js/jogo.js"></script>
+</body>
+</html>
