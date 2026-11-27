@@ -232,6 +232,12 @@ function objetivo() {
   return 'Objetivo: chegar à Estação Vega.';
 }
 
+const barrinhas = (valor, maximo, total) => {
+  const ativo = Math.round(Math.max(0, Math.min(1, valor / maximo)) * total);
+  return `<div class="barrinhas">${Array.from({ length: total }, (_, i) =>
+    `<i class="${i < ativo ? 'ativo' : ''}"></i>`).join('')}</div>`;
+};
+
 function atualizarPaineis() {
   const c = E.base[E.pos], d = E.dados.get(E.pos), M = E.missao.id;
   const dadosCorpo = [
@@ -256,18 +262,43 @@ function atualizarPaineis() {
   const rot = M === 1 ? (E.fase === 0 ? 'rota mais segura' : 'rota mais curta') : M === 2 ? 'rota ótima (TSP)' : 'rota de fuga';
   $('#info-nave').innerHTML = `<b class="nave-titulo">${E.nave.emoji} ${E.nave.nome}</b>
     <div class="status-nave">
-      <div class="combustivel-nave"><span>combustível ${E.combustivel}/${combMax()}</span>
-        <div class="barra"><i style="width:${Math.round(E.combustivel / combMax() * 100)}%"></i></div>
+      <div class="linha-medidor">
+        <span class="rotulo-medidor">combustível</span>
+        <strong class="valor-medidor">${E.combustivel}/${combMax()}</strong>
+        ${barrinhas(E.combustivel, combMax(), 12)}
       </div>
-      <div class="atributos-nave"><span>carga ${E.carga}/${cargaMax()}</span><span>velocidade ${E.nave.v}</span></div>
+      <div class="linha-medidor">
+        <span class="rotulo-medidor">carga</span>
+        <strong class="valor-medidor">${E.carga}/${cargaMax()}</strong>
+        ${barrinhas(E.carga, cargaMax(), 4)}
+      </div>
+      <div class="linha-medidor">
+        <span class="rotulo-medidor">velocidade</span>
+        <strong class="valor-medidor">${E.nave.v}/5</strong>
+        ${barrinhas(E.nave.v, 5, 5)}
+      </div>
+      <div class="linha-medidor">
+        <span class="rotulo-medidor">itens entregues</span>
+        <strong class="valor-medidor">${E.entregues.size}/4</strong>
+        ${barrinhas(E.entregues.size, 4, 4)}
+      </div>
     </div>
     <div class="objetivo-nave">${objetivo()}${M === 3 ? `<br>próximo colapso em <b id="cont">${E.cont}</b>s` : ''}</div>
     <div class="nave-acoes">
-      <button class="btn" data-acao="rota">${rot}</button>
-      <button class="btn" data-acao="regioes">regiões navegáveis</button>
-      <button class="btn" data-acao="ciclos">ciclos / rotas</button>
+      <div class="acao-nave">
+        <button class="btn" data-acao="rota" aria-label="${rot}" title="${rot}"></button>
+        <span>${rot}</span>
+      </div>
+      <div class="acao-nave">
+        <button class="btn" data-acao="regioes" aria-label="regiões navegáveis" title="regiões navegáveis"></button>
+        <span>regiões navegáveis</span>
+      </div>
+      <div class="acao-nave">
+        <button class="btn" data-acao="ciclos" aria-label="ciclos / rotas" title="ciclos / rotas"></button>
+        <span>ciclos / rotas</span>
+      </div>
     </div>
-    <div class="log">${E.msgs.slice(-4).map(m => `<div>${m}</div>`).join('')}</div>`;
+    <div class="log">&gt; ${E.msgs[E.msgs.length - 1]}</div>`;
 }
 
 function desenhar() {
