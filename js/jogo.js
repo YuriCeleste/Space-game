@@ -1,7 +1,5 @@
 /* =====================================================================
    jogo.js — telas, nave, missões e desenho do mapa (SVG).
-   Aqui os algoritmos de algoritmos.js são CHAMADOS; a lógica de grafos em si
-   não fica neste arquivo.
    ===================================================================== */
 const NAVES = [
   { id: 'A', nome: 'nave a', emoji: '🛸', c: 3, k: 3, v: 3 },
@@ -15,12 +13,32 @@ const MISSOES = [
   { id: 3, titulo: 'Setor Colapsando', desc: 'Um buraco negro devora o setor. Chegue à Estação Vega antes que as rotas sumam.', inicio: 'lua', destino: 'vega' },
 ];
 
-const E = { concluidas: {} };            // estado global do jogo
+const E = { concluidas: {}, historicoTelas: [] }; 
 const $ = s => document.querySelector(s);
-const mostrar = t => document.querySelectorAll('.tela').forEach(s => s.classList.toggle('ativa', s.id === t));
+
+/* ---------- NAVEGAÇÃO ---------- */
+function mostrar(tela, salvar = true) {
+  const telaAtiva = document.querySelector('.tela.ativa');
+  if (salvar && telaAtiva && telaAtiva.id !== tela) {
+    E.historicoTelas.push(telaAtiva.id);
+  }
+  document.querySelectorAll('.tela').forEach(s => s.classList.toggle('ativa', s.id === tela));
+}
+
+function voltar() {
+  if (E.historicoTelas.length > 0) {
+    const anterior = E.historicoTelas.pop();
+    mostrar(anterior, false);
+  } else {
+    // Se não tiver histórico, vai para o início e limpa a pilha
+    E.historicoTelas = [];
+    mostrar('tela-inicio', false);
+  }
+}
+
 const combMax = () => 40 + 25 * E.nave.c;
 const cargaMax = () => 2 * E.nave.k;
-const custo = e => Math.ceil(e.combustivel * E.nave.fator);   // nave rápida gasta mais
+const custo = e => Math.ceil(e.combustivel * E.nave.fator);
 const nome = id => E.base[id].nome;
 const msg = t => { E.msgs.push(t); };
 const rnd = (a, b) => Math.round(a + Math.random() * (b - a));
@@ -57,7 +75,6 @@ function iniciarJogo() {
   mostrar('tela-jogo'); desenhar(); atualizarPaineis();
 }
 
-// Exploração: ao chegar num corpo, a nave coleta dados científicos
 function coletar(id) {
   if (E.dados.has(id)) return;
   E.dados.set(id, {
@@ -71,7 +88,6 @@ function coletar(id) {
 
 /* ---------- Missão 3: colapso do setor ---------- */
 function iniciarColapso() {
-  // BFS a partir do buraco negro: o que está mais perto desaparece primeiro
   const d = bfsDistancias(E.g, 'negro');
   E.ordem = [...d].filter(([id]) => id !== 'negro' && id !== E.missao.destino)
     .sort((a, b) => a[1] - b[1]).map(([id]) => id);
@@ -87,7 +103,7 @@ function iniciarColapso() {
 
 function colapsar(id) {
   const n = nome(id);
-  E.g.removerVertice(id);                 // some do grafo: as rotas por ele deixam de existir
+  E.g.removerVertice(id);
   E.destaque = null; msg(`💥 ${n} colapsou!`);
   if (id === E.pos && !E.viajando) return fim(false, `${n} foi engolido com a nave dentro.`);
   desenhar(); atualizarPaineis(); checarPresa();
@@ -147,7 +163,6 @@ function chegar(id) {
   desenhar(); atualizarPaineis(); checarPresa();
 }
 
-// Game over: sem combustível (e fora de estação) ou sem nenhum caminho possível
 function checarPresa() {
   if (E.fim || E.viajando) return;
   const t = E.g.vertices.get(E.pos);
@@ -165,7 +180,6 @@ function fim(ok, texto) {
   desenhar(); atualizarPaineis();
 }
 
-/* ---------- botões dos painéis (chamam os algoritmos) ---------- */
 function acao(a) {
   if (E.fim || E.viajando) return;
   const g = E.g, M = E.missao.id;
@@ -173,16 +187,16 @@ function acao(a) {
 
   if (a === 'rota') {
     let r = null, info = '';
-    if (M === 1) {                         // Dijkstra: ida por RISCO, volta por COMBUSTÍVEL
+    if (M === 1) {
       const ida = E.fase === 0, alvo = ida ? 'esmeralda' : 'terra';
       const { dist, prev } = dijkstra(g, E.pos, (ida ? PESOS.risco : PESOS.combustivel)(g));
       r = reconstruirCaminho(prev, E.pos, alvo);
       info = ida ? `Rota mais segura: risco total ${Math.round(dist.get(alvo))}.` : `Rota mais curta: ${Math.round(dist.get(alvo))} de combustível (base).`;
-    } else if (M === 2) {                  // TSP entre as entregas que faltam, terminando na Terra
+    } else if (M === 2) {
       const falta = E.missao.alvos.filter(x => !E.entregues.has(x));
       const t = tsp(g, E.pos, falta, 'terra');
       if (t) { r = t.rota; info = `Melhor ordem: ${t.ordem.map(nome).join(' → ')} → Terra (${t.custo} de combustível base).`; }
-    } else {                               // Dijkstra no grafo ATUAL (já sem os setores colapsados)
+    } else {
       const { dist, prev } = dijkstra(g, E.pos, PESOS.combustivel(g));
       r = reconstruirCaminho(prev, E.pos, E.missao.destino);
       info = `Rota de fuga: ${Math.round(dist.get(E.missao.destino))} de combustível (base).`;
@@ -190,13 +204,13 @@ function acao(a) {
     if (r && r.length > 1) { E.destaque = { tipo: 'rota', ids: r }; msg('✨ ' + info); } else msg('Nenhuma rota disponível!');
   }
 
-  if (a === 'regioes') {                   // componentes conexos
+  if (a === 'regioes') {
     const comps = componentesConexos(g), c = comps.find(x => x.includes(E.pos));
     E.destaque = { tipo: 'regiao', ids: c };
     msg(`🗺️ ${comps.length} região(ões) isolada(s). A sua tem ${c.length} corpos.`);
   }
 
-  if (a === 'ciclos') {                    // ciclos = rotas comerciais
+  if (a === 'ciclos') {
     const cs = encontrarCiclos(g);
     if (!cs.length) msg('Nenhum ciclo no grafo.');
     else {
@@ -208,7 +222,6 @@ function acao(a) {
   desenhar(); atualizarPaineis(); checarPresa();
 }
 
-/* ---------- painéis ---------- */
 function objetivo() {
   const M = E.missao.id;
   if (M === 1) return E.fase === 0 ? 'Objetivo: chegar à Nebulosa Esmeralda.' : 'Objetivo: voltar à Terra.';
@@ -238,14 +251,13 @@ function atualizarPaineis() {
     <div class="log">${E.msgs.slice(-4).map(m => `<div>${m}</div>`).join('')}</div>`;
 }
 
-/* ---------- desenho do grafo em SVG ---------- */
 function desenhar() {
   const g = E.g, at = E.pos, D = E.destaque, ids = new Set(D ? D.ids : []), arD = new Set();
   if (D && D.tipo !== 'regiao') D.ids.forEach((v, i) => { const w = D.ids[i + 1]; if (w) { arD.add(v + '|' + w); arD.add(w + '|' + v); } });
   const viz = new Set(g.vizinhos(at).map(v => v.to));
   let s = '<defs><marker id="seta" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#2b1b44"/></marker></defs>';
   for (const e of E.todasArestas) {
-    if (!g.vertices.has(e.a) || !g.vertices.has(e.b)) continue;   // aresta de vértice colapsado some
+    if (!g.vertices.has(e.a) || !g.vertices.has(e.b)) continue;
     const A = E.base[e.a], B = E.base[e.b];
     const dx = B.x - A.x, dy = B.y - A.y, distancia = Math.hypot(dx, dy), margem = 32;
     const x1 = A.x + dx / distancia * margem, y1 = A.y + dy / distancia * margem;
@@ -279,7 +291,12 @@ function desenhar() {
 /* ---------- eventos ---------- */
 document.addEventListener('click', ev => {
   const q = s => ev.target.closest(s);
-  if (q('#btn-iniciar')) { montarMenu(); mostrar('tela-missoes'); }
+  
+  // BOTÃO GLOBAL DE FECHAR (VOLTAR)
+  if (q('#btn-fechar')) {
+    voltar();
+  }
+  else if (q('#btn-iniciar')) { montarMenu(); mostrar('tela-missoes'); }
   else if (q('[data-missao]')) { E.missao = MISSOES.find(m => m.id == q('[data-missao]').dataset.missao); mostrar('tela-naves'); }
   else if (q('[data-sel]')) {
     const n = NAVES.find(x => x.id === q('[data-sel]').dataset.sel);
@@ -290,5 +307,11 @@ document.addEventListener('click', ev => {
   else if (q('#btn-comecar')) iniciarJogo();
   else if (q('[data-acao]')) acao(q('[data-acao]').dataset.acao);
   else if (q('#mapa .no')) viajar(q('#mapa .no').dataset.id);
-  else if (q('#btn-menu')) { const m = E.missao; montarMenu(); E.missao = m; mostrar('tela-missoes'); }
+  else if (q('#btn-menu')) { 
+    // Botão "voltar ao menu" do game over
+    const m = E.missao; 
+    montarMenu(); 
+    E.missao = m; 
+    mostrar('tela-missoes'); 
+  }
 });

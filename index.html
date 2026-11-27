@@ -3,26 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jornada Espacial — Grafos</title>
+  <title>Space Game — Grafos</title>
   <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
+
+<body>
+  <!-- Botão global de fechar/voltar ao início -->
+  <button id="btn-fechar" title="Voltar ao início">✖</button>
+
+  <!-- TELA INICIAL -->
   <section id="tela-inicio" class="tela ativa">
-    <h1 class="pilula">Jornada Espacial</h1>
-    <button class="pilula grande" id="btn-iniciar">iniciar</button>
+    <h1 class="titulo-retro">SPACE<span>GAME</span></h1>
+    <button class="btn-arcade" id="btn-iniciar">INICIAR</button>
   </section>
 
+
+
+   <!-- TELA DE MISSÕES -->
   <section id="tela-missoes" class="tela">
-    <h1 class="pilula">missões</h1>
-    <div class="cards" id="lista-missoes"></div>
+    <div class="painel-opcoes">
+      <h1 class="pilula">missões</h1>
+      <div class="cards" id="lista-missoes"></div>
+    </div>
   </section>
 
+  <!-- TELA DE NAVES -->
   <section id="tela-naves" class="tela">
-    <h1 class="pilula">naves</h1>
-    <div class="cards" id="lista-naves"></div>
-    <button class="btn grande" id="btn-comecar" disabled>começar</button>
+    <div class="painel-opcoes">
+      <h1 class="pilula">naves</h1>
+      <div class="cards" id="lista-naves"></div>
+      <button class="btn grande" id="btn-comecar" disabled>começar</button>
+    </div>
   </section>
-
+  
+  <!-- TELA DE JOGO -->
   <section id="tela-jogo" class="tela">
     <h2 class="pilula" id="titulo-missao"></h2>
     <div class="jogo">
@@ -35,7 +50,7 @@
     <div id="fim" class="fim oculto"></div>
   </section>
 
-  <!-- Scripts comuns (sem módulos), para funcionar abrindo o index.html direto -->
+  <!-- SCRIPTS -->
   <script src="js/grafo.js"></script>
   <script src="js/algoritmos.js"></script>
   <script src="js/universo.js"></script>
