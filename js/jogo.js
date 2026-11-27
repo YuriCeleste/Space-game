@@ -234,20 +234,39 @@ function objetivo() {
 
 function atualizarPaineis() {
   const c = E.base[E.pos], d = E.dados.get(E.pos), M = E.missao.id;
-  $('#info-corpo').innerHTML = `<b>${c.emoji} ${c.nome}</b><hr>
-    tipo: ${c.tipo}<br>riqueza científica: ${'★'.repeat(c.riqueza)}<br>gravidade: ${c.gravidade}<br>
-    perigos: ${c.perigo ? c.perigo.tipo : 'nenhum'}<br>recursos: ${c.recursos}
-    ${d ? `<hr>campo magnético: ${d.campo}<br>atmosfera: ${d.atmosfera}<br>minerais: ${d.minerais}<br>prob. de vida: ${d.vida}<br>anomalias: ${d.anomalias}` : ''}
-    ${c.tipo === 'estacao' ? '<hr><button class="btn" data-acao="reabastecer">reabastecer tudo</button>' : ''}`;
+  const dadosCorpo = [
+    ['tipo', c.tipo],
+    ['riqueza científica', '★'.repeat(c.riqueza)],
+    ['gravidade', c.gravidade],
+    ['perigos', c.perigo ? c.perigo.tipo : 'nenhum'],
+    ['recursos', c.recursos],
+    ...(d ? [
+      ['campo magnético', d.campo],
+      ['atmosfera', d.atmosfera],
+      ['minerais', d.minerais],
+      ['prob. de vida', d.vida],
+      ['anomalias', d.anomalias],
+    ] : []),
+  ];
+  $('#info-corpo').innerHTML = `<div class="corpo-cabecalho"><b>${c.emoji} ${c.nome}</b></div>
+    <div class="dados-corpo">${dadosCorpo.map(([rotulo, valor]) =>
+      `<div class="dado-corpo"><span>${rotulo}</span><strong>${valor}</strong></div>`).join('')}
+      ${c.tipo === 'estacao' ? '<div class="acao-corpo"><button class="btn" data-acao="reabastecer">reabastecer tudo</button></div>' : ''}
+    </div>`;
   const rot = M === 1 ? (E.fase === 0 ? 'rota mais segura' : 'rota mais curta') : M === 2 ? 'rota ótima (TSP)' : 'rota de fuga';
-  $('#info-nave').innerHTML = `<b>${E.nave.emoji} ${E.nave.nome}</b><hr>
-    combustível: ${E.combustivel}/${combMax()}
-    <div class="barra"><i style="width:${Math.round(E.combustivel / combMax() * 100)}%"></i></div>
-    carga: ${E.carga}/${cargaMax()} &nbsp; velocidade: ${E.nave.v}<br><br>
-    ${objetivo()}<br>${M === 3 ? `próximo colapso em <span id="cont">${E.cont}</span>s<br>` : ''}<br>
-    <button class="btn" data-acao="rota">${rot}</button>
-    <button class="btn" data-acao="regioes">regiões navegáveis</button>
-    <button class="btn" data-acao="ciclos">ciclos / rotas</button>
+  $('#info-nave').innerHTML = `<b class="nave-titulo">${E.nave.emoji} ${E.nave.nome}</b>
+    <div class="status-nave">
+      <div class="combustivel-nave"><span>combustível ${E.combustivel}/${combMax()}</span>
+        <div class="barra"><i style="width:${Math.round(E.combustivel / combMax() * 100)}%"></i></div>
+      </div>
+      <div class="atributos-nave"><span>carga ${E.carga}/${cargaMax()}</span><span>velocidade ${E.nave.v}</span></div>
+    </div>
+    <div class="objetivo-nave">${objetivo()}${M === 3 ? `<br>próximo colapso em <b id="cont">${E.cont}</b>s` : ''}</div>
+    <div class="nave-acoes">
+      <button class="btn" data-acao="rota">${rot}</button>
+      <button class="btn" data-acao="regioes">regiões navegáveis</button>
+      <button class="btn" data-acao="ciclos">ciclos / rotas</button>
+    </div>
     <div class="log">${E.msgs.slice(-4).map(m => `<div>${m}</div>`).join('')}</div>`;
 }
 
@@ -255,7 +274,7 @@ function desenhar() {
   const g = E.g, at = E.pos, D = E.destaque, ids = new Set(D ? D.ids : []), arD = new Set();
   if (D && D.tipo !== 'regiao') D.ids.forEach((v, i) => { const w = D.ids[i + 1]; if (w) { arD.add(v + '|' + w); arD.add(w + '|' + v); } });
   const viz = new Set(g.vizinhos(at).map(v => v.to));
-  let s = '<defs><marker id="seta" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#2b1b44"/></marker></defs>';
+  let s = '';
   for (const e of E.todasArestas) {
     if (!g.vertices.has(e.a) || !g.vertices.has(e.b)) continue;
     const A = E.base[e.a], B = E.base[e.b];
@@ -264,7 +283,7 @@ function desenhar() {
     const x2 = B.x - dx / distancia * margem, y2 = B.y - dy / distancia * margem;
     const poss = (e.a === at && viz.has(e.b)) || (!e.dirigida && e.b === at && viz.has(e.a));
     const cls = arD.has(e.a + '|' + e.b) ? 'ideal' : poss ? 'possivel' : '';
-    s += `<line class="aresta ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${e.dirigida ? 'marker-end="url(#seta)"' : ''}/>`;
+    s += `<line class="aresta ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
     if (poss) s += `<text class="custo" x="${(A.x + B.x) / 2}" y="${(A.y + B.y) / 2}">⛽${custo(e)}</text>`;
   }
   for (const c of Object.values(E.base)) {

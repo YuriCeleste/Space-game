@@ -296,6 +296,7 @@ body {
 .jogo {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-rows: auto auto;
   gap: 16px;
   width: 100%;
   max-width: 1250px;
@@ -307,6 +308,9 @@ body {
 
 #mapa {
   width: 100%;
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
   /* background: var(--mapa); */
   background-image: url('../assets/imagens/ospace.jpg');
   border-radius: 8px;
@@ -316,23 +320,120 @@ aside {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
 }
 
 .painel {
   border-radius: 16px;
-  padding: 14px;
-  font-size: 0.78rem;
+  padding: 20px;
+  font-size: 0.95rem;
   overflow: auto;
 }
 
 .painel.claro {
   background: #ddd;
-  max-height: 310px;
+  display: grid;
+  grid-template-columns: minmax(160px, 210px) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  grid-column: 1 / -1;
+  grid-row: 2;
 }
 
 .painel.escuro {
   background: #404040;
   color: #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+  flex: 1;
+  min-height: 0;
+}
+
+.corpo-cabecalho {
+  font-size: 1.2rem;
+}
+
+.dados-corpo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.dado-corpo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  min-height: 64px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.55);
+  border-left: 3px solid var(--roxo);
+  border-radius: 7px;
+  overflow-wrap: anywhere;
+}
+
+.dado-corpo span {
+  color: #444;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.dado-corpo strong {
+  font-size: 1rem;
+}
+
+.acao-corpo {
+  display: flex;
+  align-items: center;
+}
+
+.acao-corpo .btn {
+  width: 100%;
+  min-height: 42px;
+}
+
+.nave-titulo {
+  font-size: 1.2rem;
+}
+
+.status-nave {
+  display: grid;
+  gap: 12px;
+}
+
+.combustivel-nave,
+.atributos-nave {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.barra {
+  height: 14px;
+  margin: 8px 0 0;
+}
+
+.objetivo-nave {
+  line-height: 1.5;
+}
+
+.nave-acoes {
+  display: grid;
+  gap: 8px;
+}
+
+.painel .nave-acoes .btn {
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+  padding: 9px 12px;
+  font-size: 0.9rem;
 }
 
 .painel hr {
@@ -360,10 +461,16 @@ aside {
 }
 
 .log {
-  margin-top: 10px;
-  border-top: 1px dashed #888;
-  padding-top: 6px;
+  max-height: 180px;
+  min-height: 76px;
+  margin-top: auto;
+  overflow: auto;
+  border: 1px solid #666;
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.18);
   font-weight: normal;
+  line-height: 1.45;
 }
 
 /* ============================================================
@@ -507,6 +614,18 @@ aside {
    ============================================================ */
 @media (max-width: 900px) {
   .jogo {
+    grid-template-columns: 1fr;
+  }
+  #mapa {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  aside {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .painel.claro {
+    grid-row: 3;
     grid-template-columns: 1fr;
   }
  .titulo-retro {
