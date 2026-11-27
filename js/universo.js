@@ -1,8 +1,7 @@
 /* =====================================================================
    universo.js — monta o GRAFO DO UNIVERSO (vértices = corpos, arestas = rotas)
-   Corpos e rotas são fixos (as missões sempre existem); só as POSIÇÕES no mapa
-   são sorteadas a cada partida. O custo de combustível de cada rota vem da
-   distância entre os corpos; o risco é definido à mão em ROTAS.
+   Os corpos são fixos; posições e quantidade de conexões variam a cada partida.
+   O custo de combustível de cada rota vem da distância entre os corpos.
    ===================================================================== */
 const CORPOS = [
   { id: 'terra', nome: 'Terra', tipo: 'planeta', emoji: '🌍', riqueza: 4, gravidade: '1,0 g', recursos: 'água, oxigênio' },
@@ -21,34 +20,97 @@ const CORPOS = [
   { id: 'exilio', nome: 'Estação Exílio', tipo: 'estacao', emoji: '🛰️', riqueza: 1, gravidade: '0 g', recursos: 'combustível' },
 ];
 
-// [origem, destino, risco, dirigida?]  — Kepler/Exílio formam uma região isolada
-const ROTAS = [
-  ['terra', 'lua', 0], ['terra', 'marte', 0], ['terra', 'venus', 1], ['terra', 'orion', 0],
-  ['lua', 'orion', 0], ['marte', 'jupiter', 1], ['marte', 'halley', 1], ['venus', 'sol', 2],
-  ['orion', 'esmeralda', 2], ['orion', 'sirius', 1], ['sirius', 'esmeralda', 0], ['halley', 'esmeralda', 1],
-  ['jupiter', 'vega', 0], ['sirius', 'vega', 1], ['halley', 'negro', 1], ['sol', 'negro', 1],
-  ['jupiter', 'negro', 2], ['venus', 'sirius', 1, true], // túnel de salto: só vai de Vênus a Sirius
-  ['kepler', 'exilio', 0],
-];
-
 function criarUniverso(L = 800, A = 500) {
-  // Sorteia uma célula de uma grade 5x3 para cada corpo (evita sobreposição) + um pequeno desvio
-  const celulas = [];
-  for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) celulas.push([c, r]);
-  celulas.sort(() => Math.random() - 0.5);
-  const g = new Grafo(), cw = L / 5, ch = A / 3;
-  CORPOS.forEach((c, i) => {
-    const [col, lin] = celulas[i];
-    g.addVertice(c.id, {
-      ...c,
-      x: col * cw + cw / 2 + (Math.random() - 0.5) * 50,
-      y: lin * ch + ch / 2 + (Math.random() - 0.5) * 50,
-    });
-  });
-  for (const [a, b, risco, dir] of ROTAS) {
-    const A_ = g.vertices.get(a), B_ = g.vertices.get(b);
-    const combustivel = Math.max(4, Math.round(Math.hypot(A_.x - B_.x, A_.y - B_.y) / 16));
-    g.addAresta(a, b, { combustivel, risco }, !!dir);
+  const g = new Grafo(), margem = 45, distanciaMinima = 70;
+  const posicionados = [];
+  for (const corpo of CORPOS) {
+    let ponto = null;
+    for (let tentativa = 0; tentativa < 1000 && !ponto; tentativa++) {
+      const candidato = {
+        x: margem + Math.random() * (L - 2 * margem),
+        y: margem + Math.random() * (A - 2 * margem),
+      };
+      if (posicionados.every(p => Math.hypot(p.x - candidato.x, p.y - candidato.y) >= distanciaMinima))
+        ponto = candidato;
+    }
+    if (!ponto) throw new Error('Não foi possível posicionar os corpos sem sobreposição.');
+    posicionados.push(ponto);
+    g.addVertice(corpo.id, { ...corpo, ...ponto });
   }
+
+  const corpos = [...g.vertices.values()];
+  const chavePar = (a, b) => [a, b].sort().join('|');
+  const paresPorChave = new Map(), pares = [];
+  for (let i = 0; i < corpos.length; i++) {
+    for (let j = i + 1; j < corpos.length; j++) {
+      const a = corpos[i], b = corpos[j];
+      const par = {
+        a,
+        b,
+        distancia: Math.hypot(a.x - b.x, a.y - b.y),
+      };
+      pares.push(par);
+      paresPorChave.set(chavePar(a.id, b.id), par);
+    }
+  }
+  pares.sort((a, b) => a.distancia - b.distancia || a.a.id.localeCompare(b.a.id) || a.b.id.localeCompare(b.b.id));
+
+  const selecionados = [];
+  const chavesSelecionadas = new Set();
+  const graus = new Map(corpos.map(c => [c.id, 0]));
+  const alvos = new Map(corpos.map(c => [c.id, 2 + Math.floor(Math.random() * 3)]));
+  const adicionarPar = par => {
+    const chave = chavePar(par.a.id, par.b.id);
+    if (chavesSelecionadas.has(chave)) return;
+    selecionados.push(par);
+    chavesSelecionadas.add(chave);
+    graus.set(par.a.id, graus.get(par.a.id) + 1);
+    graus.set(par.b.id, graus.get(par.b.id) + 1);
+  };
+
+  // Forma um caminho usando o vizinho mais próximo ainda não visitado.
+  const ordem = [corpos[Math.floor(Math.random() * corpos.length)]];
+  const restantes = new Set(corpos.filter(c => c.id !== ordem[0].id));
+  while (restantes.size) {
+    const atual = ordem[ordem.length - 1];
+    const proximo = [...restantes].sort((a, b) =>
+      Math.hypot(atual.x - a.x, atual.y - a.y) - Math.hypot(atual.x - b.x, atual.y - b.y))[0];
+    adicionarPar(paresPorChave.get(chavePar(atual.id, proximo.id)));
+    ordem.push(proximo);
+    restantes.delete(proximo);
+  }
+  const chavesCaminho = new Set(ordem.slice(1).map((corpo, i) =>
+    chavePar(ordem[i].id, corpo.id)));
+
+  // Os extremos do caminho também precisam de pelo menos duas conexões.
+  for (const extremo of [ordem[0], ordem[ordem.length - 1]]) {
+    if (graus.get(extremo.id) >= 2) continue;
+    const par = pares.find(p =>
+      (p.a.id === extremo.id || p.b.id === extremo.id) &&
+      !chavesSelecionadas.has(chavePar(p.a.id, p.b.id)) &&
+      graus.get(p.a.id === extremo.id ? p.b.id : p.a.id) < 4);
+    if (!par) throw new Error('Não foi possível conectar todos os corpos.');
+    const vizinho = par.a.id === extremo.id ? par.b : par.a;
+    adicionarPar(par);
+    alvos.set(vizinho.id, Math.max(alvos.get(vizinho.id), graus.get(vizinho.id)));
+  }
+
+  for (const par of pares) {
+    if (graus.get(par.a.id) < alvos.get(par.a.id) && graus.get(par.b.id) < alvos.get(par.b.id))
+      adicionarPar(par);
+  }
+
+  selecionados.sort((a, b) => a.distancia - b.distancia);
+  const indiceTunel = selecionados.findIndex(par =>
+    !chavesCaminho.has(chavePar(par.a.id, par.b.id)));
+  const quantidadeRiscoZero = Math.round(selecionados.length * 7 / 19);
+  const quantidadeRiscoDois = Math.round(selecionados.length * 3 / 19);
+  selecionados.forEach((par, i) => {
+    const risco = i < quantidadeRiscoZero ? 0
+      : i >= selecionados.length - quantidadeRiscoDois ? 2 : 1;
+    const dirigida = i === indiceTunel;
+    const combustivel = Math.max(4, Math.round(par.distancia / 16));
+    g.addAresta(par.a.id, par.b.id, { combustivel, risco }, dirigida);
+  });
   return g;
 }
