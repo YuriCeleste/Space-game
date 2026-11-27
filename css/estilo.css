@@ -651,7 +651,10 @@ aside {
 .rot {
   font-size: 11px;
   text-anchor: middle;
-  fill: #1b1030;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: #111;
+  stroke-width: 2px;
 }
 
 .orbita {
