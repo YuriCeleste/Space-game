@@ -307,7 +307,8 @@ body {
 
 #mapa {
   width: 100%;
-  background: var(--mapa);
+  /* background: var(--mapa); */
+  background-image: url('../assets/imagens/ospace.jpg');
   border-radius: 8px;
 }
 
@@ -375,7 +376,7 @@ aside {
 }
 
 .aresta.possivel {
-  stroke: #000;
+  stroke: #fff;
   stroke-width: 3.5;
   stroke-dasharray: 6 5;
   opacity: 1;
