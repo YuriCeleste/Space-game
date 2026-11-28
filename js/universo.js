@@ -4,20 +4,20 @@
    O custo de combustível de cada rota vem da distância entre os corpos.
    ===================================================================== */
 const CORPOS = [
-  { id: 'terra', nome: 'Terra', tipo: 'planeta', emoji: '🌍', riqueza: 4, gravidade: '1,0 g', recursos: 'água, oxigênio' },
-  { id: 'lua', nome: 'Lua', tipo: 'planeta', emoji: '🌕', riqueza: 3, gravidade: '0,16 g', recursos: 'hélio-3, rochas' },
-  { id: 'marte', nome: 'Marte', tipo: 'planeta', emoji: '🔴', riqueza: 4, gravidade: '0,38 g', recursos: 'ferro, gelo' },
-  { id: 'venus', nome: 'Vênus', tipo: 'planeta', emoji: '🟠', riqueza: 3, gravidade: '0,9 g', recursos: 'enxofre' },
-  { id: 'jupiter', nome: 'Júpiter', tipo: 'planeta', emoji: '🪐', riqueza: 5, gravidade: '2,5 g', recursos: 'hidrogênio' },
-  { id: 'sol', nome: 'Sol', tipo: 'estrela', emoji: '☀️', riqueza: 5, gravidade: '28 g', recursos: 'energia solar', perigo: { tipo: 'tempestade', nivel: 1 } },
-  { id: 'sirius', nome: 'Sirius', tipo: 'estrela', emoji: '✨', riqueza: 4, gravidade: '12 g', recursos: 'energia' },
-  { id: 'halley', nome: 'Cometa Halley', tipo: 'cometa', emoji: '☄️', riqueza: 2, gravidade: '0,001 g', recursos: 'gelo, carbono', perigo: { tipo: 'piratas', nivel: 2 } },
-  { id: 'orion', nome: 'Estação Órion', tipo: 'estacao', emoji: '🛰️', riqueza: 2, gravidade: '0 g', recursos: 'combustível, peças' },
-  { id: 'vega', nome: 'Estação Vega', tipo: 'estacao', emoji: '📡', riqueza: 2, gravidade: '0 g', recursos: 'combustível, abrigo' },
-  { id: 'esmeralda', nome: 'Nebulosa Esmeralda', tipo: 'nebulosa', emoji: '🌫️', riqueza: 5, gravidade: '0 g', recursos: 'gás ionizado' },
-  { id: 'negro', nome: 'Buraco Negro', tipo: 'buraco negro', emoji: '🕳️', riqueza: 5, gravidade: '∞', recursos: 'nenhum', perigo: { tipo: 'buraco', nivel: 99 } },
-  { id: 'kepler', nome: 'Kepler-22b', tipo: 'planeta', emoji: '🌐', riqueza: 4, gravidade: '2,4 g', recursos: 'água' },
-  { id: 'exilio', nome: 'Estação Exílio', tipo: 'estacao', emoji: '🛰️', riqueza: 1, gravidade: '0 g', recursos: 'combustível' },
+  { id: 'terra', nome: 'Terra', tipo: 'planeta', imagem: 'url("https://static.vecteezy.com/system/resources/previews/068/072/470/non_2x/planet-earth-view-from-outer-space-free-png.png")', riqueza: 4, gravidade: '1,0 g', recursos: 'água, oxigênio' },
+  { id: 'lua', nome: 'Lua', tipo: 'planeta', imagem: 'url("https://png.pngtree.com/png-clipart/20231204/original/pngtree-full-moon-fullmoon-photo-png-image_13764750.png")', riqueza: 3, gravidade: '0,16 g', recursos: 'hélio-3, rochas' },
+  { id: 'marte', nome: 'Marte', tipo: 'planeta', imagem: 'url("https://png.pngtree.com/png-clipart/20240310/original/pngtree-mars-planet-space-png-image_14554078.png")', riqueza: 4, gravidade: '0,38 g', recursos: 'ferro, gelo' },
+  { id: 'venus', nome: 'Vênus', tipo: 'planeta', imagem: 'url("https://static.vecteezy.com/system/resources/previews/065/984/855/non_2x/venus-planet-space-isolated-at-transparent-background-png.png")', riqueza: 3, gravidade: '0,9 g', recursos: 'enxofre' },
+  { id: 'jupiter', nome: 'Júpiter', tipo: 'planeta', imagem: 'url("https://upload.wikimedia.org/wikipedia/commons/e/e1/Jupiter_%28transparent%29.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original")', riqueza: 5, gravidade: '2,5 g', recursos: 'hidrogênio' },
+  { id: 'sol', nome: 'Sol', tipo: 'estrela', imagem: 'url("https://static.vecteezy.com/system/resources/thumbnails/049/667/553/small_2x/sun-s-fiery-surface-with-transparent-background-a-glowing-celestial-body-with-intricate-details-png.png")', riqueza: 5, gravidade: '28 g', recursos: 'energia solar', perigo: { tipo: 'tempestade', nivel: 1 } },
+  { id: 'sirius', nome: 'Sirius', tipo: 'estrela', imagem: 'url("https://static.wikia.nocookie.net/cell-to-singularity-evolution/images/5/50/Sirius_Icon.png/revision/latest/scale-to-width/360?cb=20241109201955")', riqueza: 4, gravidade: '12 g', recursos: 'energia' },
+  { id: 'halley', nome: 'Cometa Halley', tipo: 'cometa', imagem: 'url("https://png.pngtree.com/recommend-works/png-clipart/20250515/ourmid/pngtree-blue-sparkling-comet-with-bright-trail-png-image_16293437.png")', riqueza: 2, gravidade: '0,001 g', recursos: 'gelo, carbono', perigo: { tipo: 'piratas', nivel: 2 } },
+  { id: 'orion', nome: 'Estação Órion', tipo: 'estacao', imagem: 'url("https://png.pngtree.com/png-vector/20240719/ourmid/pngtree-international-space-station--iss--a-complete-overview-png-image_13152583.png")', riqueza: 2, gravidade: '0 g', recursos: 'combustível, peças' },
+  { id: 'vega', nome: 'Estação Vega', tipo: 'estacao', imagem: 'url("https://static.vecteezy.com/system/resources/previews/045/911/892/non_2x/massive-interstellar-space-station-cut-out-stock-png.png")', riqueza: 2, gravidade: '0 g', recursos: 'combustível, abrigo' },
+  { id: 'esmeralda', nome: 'Nebulosa Esmeralda', tipo: 'nebulosa', imagem: 'url("https://thumbs.dreamstime.com/b/nebulosa-verde-esmeralda-no-espa%C3%A7o-exterior-nuvens-e-estrelas-c%C3%B3smicas-uma-imagem-impressionante-de-vibrante-que-mostra-em-379815453.jpg")', riqueza: 5, gravidade: '0 g', recursos: 'gás ionizado' },
+  { id: 'negro', nome: 'Buraco Negro', tipo: 'buraco negro', imagem: 'url("https://png.pngtree.com/png-vector/20251117/ourmid/pngtree-a-stylized-illustration-of-black-hole-with-glowing-accretion-disk-and-png-image_17999227.webp")', riqueza: 5, gravidade: '∞', recursos: 'nenhum', perigo: { tipo: 'buraco', nivel: 99 } },
+  { id: 'kepler', nome: 'Kepler-22b', tipo: 'planeta', imagem: 'url("https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Kepler22b.png/1280px-Kepler22b.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail")', riqueza: 4, gravidade: '2,4 g', recursos: 'água' },
+  { id: 'exilio', nome: 'Estação Exílio', tipo: 'estacao', imagem: 'url("https://png.pngtree.com/png-clipart/20250806/original/pngtree-futuristic-space-station-with-solar-panels-and-antennas-isolated-on-transparent-png-image_21614759.png")', riqueza: 1, gravidade: '0 g', recursos: 'combustível' },
 ];
 
 function criarUniverso(L = 800, A = 500) {

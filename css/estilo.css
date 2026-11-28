@@ -400,7 +400,21 @@ aside {
   align-items: center;
   justify-content: center;
   min-height: 100px;
-  font-size: 4.5rem;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.corpo-visual-mapa {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.corpo-imagem-container {
+  pointer-events: none;
 }
 
 .corpo-informacoes {
@@ -707,21 +721,15 @@ aside {
   stroke-width: 3px;
 }
 
-.no .emoji {
-  font-size: 34px;
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-
 .no.possivel {
   cursor: pointer;
 }
 
-.no.possivel .emoji {
+.no.possivel .corpo-visual {
   filter: drop-shadow(0 0 7px #fff);
 }
 
-.no.dest .emoji {
+.no.dest .corpo-visual {
   filter: drop-shadow(0 0 9px #ffe14d);
 }
 

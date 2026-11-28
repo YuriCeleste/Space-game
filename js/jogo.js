@@ -272,7 +272,8 @@ function atualizarPaineis() {
       ['anomalias', d.anomalias],
     ] : []),
   ];
-  $('#info-corpo').innerHTML = `<div class="corpo-imagem" role="img" aria-label="${c.nome}">${c.emoji}</div>
+  $('#info-corpo').innerHTML = `<div class="corpo-imagem corpo-visual" role="img" aria-label="${c.nome}"
+      style='background-image: ${c.imagem};'></div>
     <div class="corpo-informacoes">
       <div class="corpo-cabecalho"><b>${c.nome}</b></div>
       <div class="dados-corpo">${dadosCorpo.map(([rotulo, valor]) =>
@@ -344,7 +345,10 @@ function desenhar() {
     const cl = ['no', !vivo && 'colapsado', vivo && viz.has(c.id) && !E.fim && 'possivel',
       D && D.tipo !== 'regiao' && ids.has(c.id) && 'dest', D && D.tipo === 'regiao' && !ids.has(c.id) && 'fora'].filter(Boolean).join(' ');
     s += `<g class="${cl}" data-id="${c.id}" transform="translate(${c.x},${c.y})"><circle r="26" fill="transparent"/>
-      <text class="emoji">${c.emoji}</text><text class="rot" y="36">${c.nome}</text></g>`;
+      <foreignObject class="corpo-imagem-container" x="-26" y="-26" width="52" height="52">
+        <div xmlns="http://www.w3.org/1999/xhtml" class="corpo-visual corpo-visual-mapa"
+          style='background-image: ${c.imagem};'></div>
+      </foreignObject><text class="rot" y="36">${c.nome}</text></g>`;
     if (vivo && c.perigo?.tipo === 'piratas')
       s += `<g transform="translate(${c.x},${c.y})"><g class="orbita rapida"><g>
         <animateMotion path="M 34 0 A 34 34 0 1 1 -34 0 A 34 34 0 1 1 34 0" dur="2s" repeatCount="indefinite" rotate="0"/>
