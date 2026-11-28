@@ -2,9 +2,9 @@
    jogo.js — telas, nave, missões e desenho do mapa (SVG).
    ===================================================================== */
 const NAVES = [
-  { id: 'A', nome: 'nave a', emoji: '🛸', c: 3, k: 3, v: 3 },
-  { id: 'B', nome: 'nave b', emoji: '🚀', c: 2, k: 2, v: 5 },
-  { id: 'C', nome: 'nave c', emoji: '🛩️', c: 5, k: 5, v: 2 },
+  { id: 'A', nome: 'OVNI', imagem: 'url("https://png.pngtree.com/png-vector/20240506/ourmid/pngtree-ufo-alien-spaceship-isolated-on-a-transparent-background-png-image_12364971.png")', c: 3, k: 3, v: 3 },
+  { id: 'B', nome: 'Foguete Lumina', imagem: 'url("https://png.pngtree.com/png-clipart/20250430/original/pngtree-silver-rocket-icon-png-image_20903190.png")', c: 2, k: 2, v: 5 },
+  { id: 'C', nome: 'Falcão Milenar', imagem: 'url("https://freepngimg.com/thumb/star_wars/5-2-star-wars-ship-vector-png.png")', c: 5, k: 5, v: 2 },
 ]; // c = combustível, k = carga, v = velocidade (níveis 1 a 5)
 
 const MISSOES = [
@@ -50,7 +50,7 @@ function montarMenu() {
     <div class="texto"><b>${m.titulo}</b><br><br>${m.desc}</div>
     <div>concluído: ${E.concluidas[m.id] ? 'sim' : 'não'} <button class="btn" data-missao="${m.id}">ir</button></div></div>`).join('');
   $('#lista-naves').innerHTML = NAVES.map(n => `<div class="card" data-nave="${n.id}">
-    <div class="icone">${n.emoji}</div><h3>${n.nome}</h3>
+    <div class="icone nave-visual" role="img" aria-label="${n.nome}" style='background-image: ${n.imagem};'></div><h3>${n.nome}</h3>
     ${[['combustível', 'c'], ['carga', 'k'], ['velocidade', 'v']].map(([r, k]) =>
       `<div>${r} <span class="pontos">${[1, 2, 3, 4, 5].map(i => `<i class="${i <= n[k] ? 'on' : ''}"></i>`).join('')}</span></div>`).join('')}
     <button class="btn" data-sel="${n.id}">selecionar</button></div>`).join('');
@@ -282,7 +282,11 @@ function atualizarPaineis() {
       </div>
     </div>`;
   const rot = M === 1 ? (E.fase === 0 ? 'rota mais segura' : 'rota mais curta') : M === 2 ? 'rota ótima (TSP)' : 'rota de fuga';
-  infoNave.innerHTML = `<b class="nave-titulo">${E.nave.emoji} ${E.nave.nome}</b>
+  infoNave.innerHTML = `<div class="nave-cabecalho">
+      <div class="nave-visual nave-visual-painel" role="img" aria-label="${E.nave.nome}"
+        style='background-image: ${E.nave.imagem};'></div>
+      <b class="nave-titulo">${E.nave.nome}</b>
+    </div>
     <div class="status-nave">
       <div class="linha-medidor">
         <span class="rotulo-medidor">combustível</span>
@@ -354,12 +358,19 @@ function desenhar() {
         <animateMotion path="M 34 0 A 34 34 0 1 1 -34 0 A 34 34 0 1 1 34 0" dur="2s" repeatCount="indefinite" rotate="0"/>
         <text>☠️</text></g></g></g>`;
   }
-  if (E.viajando) s += `<text id="nave-voo" class="nave" transform="translate(${E.navePos.x},${E.navePos.y})">${E.nave.emoji}</text>`;
+  if (E.viajando) s += `<g id="nave-voo" transform="translate(${E.navePos.x},${E.navePos.y})">
+    <foreignObject class="nave-imagem-container" x="-16" y="-16" width="32" height="32">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="nave-visual nave-visual-mapa"
+        style='background-image: ${E.nave.imagem};'></div>
+    </foreignObject></g>`;
   else {
     const P = E.base[at];
     s += `<g transform="translate(${P.x},${P.y})"><g class="orbita nave-orbita">
       <g><animateMotion path="M -32 0 A 32 32 0 1 1 32 0 A 32 32 0 1 1 -32 0" dur="4s" repeatCount="indefinite" rotate="0"/>
-      <text>${E.nave.emoji}</text></g></g></g>`;
+      <foreignObject class="nave-imagem-container" x="-16" y="-16" width="32" height="32">
+        <div xmlns="http://www.w3.org/1999/xhtml" class="nave-visual nave-visual-mapa"
+          style='background-image: ${E.nave.imagem};'></div>
+      </foreignObject></g></g></g>`;
   }
   $('#mapa').innerHTML = s;
 }
