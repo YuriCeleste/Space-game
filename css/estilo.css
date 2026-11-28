@@ -314,9 +314,11 @@ body {
   grid-row: 1;
   height: 46px;
   width: 100%;
-  border: 2px solid #111;
+  border: 4px outset #888;
   border-radius: 0;
-  background: #f1f1f1;
+  position: relative;
+  isolation: isolate;
+  background: transparent;
   box-shadow: none;
   display: flex;
   align-items: center;
@@ -328,6 +330,27 @@ body {
   text-overflow: ellipsis;
 }
 
+#titulo-missao::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(90deg, #858585 0%, #ededed 25%, #a9a9a9 50%, #ffffff 75%, #858585 100%);
+  background-size: 200% 100%;
+  animation: brilho-missao 5s linear infinite, tons-missao 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes brilho-missao {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
+}
+
+@keyframes tons-missao {
+  from { filter: brightness(0.78); }
+  to { filter: brightness(1.18); }
+}
+
 #mapa {
   width: 100%;
   height: 420px;
@@ -335,7 +358,7 @@ body {
   grid-row: 2;
   display: block;
   background: #111 url('../assets/imagens/ospace.jpg') center/cover no-repeat;
-  border: 2px solid #111;
+  border: 4px outset #888;
   border-radius: 0;
   object-fit: cover;
 }
@@ -359,9 +382,9 @@ aside {
 .painel.claro {
   background: #4a5269;
   color: #f7f7f7;
-  border: 2px solid #111;
+  border: 4px outset #888;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 120px minmax(0, 1fr);
   align-content: start;
   gap: 8px;
   grid-column: 1 / -1;
@@ -370,9 +393,24 @@ aside {
   padding: 10px;
 }
 
+.corpo-imagem {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  font-size: 4.5rem;
+}
+
+.corpo-informacoes {
+  grid-column: 2;
+  min-width: 0;
+}
+
 .painel.escuro {
   background: #3f465d;
-  border: 2px solid #111;
+  border: 4px outset #888;
   color: #eee;
   display: flex;
   flex-direction: column;
@@ -429,11 +467,30 @@ aside {
 .acao-corpo {
   display: flex;
   align-items: center;
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .acao-corpo .btn {
   width: 100%;
-  min-height: 42px;
+  min-height: 48px;
+  margin: 0;
+  padding: 8px 12px;
+  background: linear-gradient(145deg, #737a91, #555d73 55%, #3f465d);
+  border: 2px solid #4b5268;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.25),
+              inset -3px -3px 6px rgba(0,0,0,0.35),
+              0 2px 4px rgba(0,0,0,0.35);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.acao-corpo .btn:hover {
+  background: linear-gradient(145deg, #858da5, #626b83 55%, #4b5268);
+  transform: translateY(-2px);
 }
 
 .nave-titulo {
@@ -477,27 +534,56 @@ aside {
   display: flex;
   gap: 2px;
   width: max-content;
-  height: 10px;
+  height: 16px;
 }
 
 .barrinhas i {
   flex: 0 0 8px;
   width: 8px;
-  height: 10px;
+  height: 16px;
   background: #555d73;
   border: 1px solid #6f7587;
-  box-shadow: inset 1px 1px 1px rgba(255,255,255,0.12);
+  /* box-shadow: inset 1px 1px 1px rgba(255,255,255,0.12); */
 }
 
 .barrinhas i.ativo {
   background: #20c52a;
   border-color: #4ffb5a;
-  box-shadow: 0 0 3px rgba(32, 197, 42, 0.8);
+  /* box-shadow: 0 0 3px rgba(32, 197, 42, 0.8); */
+  min-height: 16px;
 }
 
 .objetivo-nave {
-  line-height: 1.35;
-  font-size: 0.72rem;
+  color:#000;
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 46px;
+  height: auto;
+  width: 100%;
+  flex: 0 0 auto;
+  display: block;
+  box-sizing: border-box;
+  border: 2px solid #111;
+  border-radius: 0;
+  background: #f1f1f1;
+  box-shadow: none;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  overflow: visible;
+}
+
+.contagem-colapso,
+.contagem-colapso #cont {
+  color: #d40000;
+  font-weight: 700;
+}
+
+.contagem-colapso {
+  white-space: nowrap;
 }
 
 .nave-acoes {
@@ -509,17 +595,17 @@ aside {
 .acao-nave {
   display: flex;
   flex-direction: column;
+  background-color:#333240;
   align-items: center;
   gap: 4px;
+  padding: 10px;
   min-width: 0;
   text-align: center;
 }
 
 .acao-nave span {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.38rem;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
+  line-height: 1.35;
+  font-size: 0.72rem;
 }
 
 .painel .nave-acoes .btn {

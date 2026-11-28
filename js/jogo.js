@@ -60,11 +60,12 @@ function montarMenu() {
 /* ---------- partida ---------- */
 function iniciarJogo() {
   clearInterval(E.timer);
+  clearInterval(E.logTimer);
   const g = criarUniverso();
   Object.assign(E, {
     g, base: Object.fromEntries(g.vertices), todasArestas: [...g.arestas], pos: E.missao.inicio,
     carga: cargaMax(), dados: new Map(), destaque: null, viajando: false, fim: false,
-    fase: 0, entregues: new Set(), msgs: [], navePos: null, cicloIdx: 0,
+    fase: 0, entregues: new Set(), msgs: [], navePos: null, cicloIdx: 0, logIndice: -1,
   });
   E.combustivel = E.missao.id === 3 ? Math.round(combMax() * 0.6) : combMax();
   coletar(E.pos);
@@ -238,8 +239,25 @@ const barrinhas = (valor, maximo, total) => {
     `<i class="${i < ativo ? 'ativo' : ''}"></i>`).join('')}</div>`;
 };
 
+function animarLog(log, texto, indice) {
+  if (E.logIndice === indice) return;
+  clearInterval(E.logTimer);
+  E.logIndice = indice;
+  const caracteres = Array.from(texto);
+  let visiveis = 0;
+  log.textContent = '> ';
+  if (!caracteres.length) return;
+  E.logTimer = setInterval(() => {
+    log.textContent += caracteres[visiveis++];
+    if (visiveis >= caracteres.length) clearInterval(E.logTimer);
+  }, 35);
+}
+
 function atualizarPaineis() {
   const c = E.base[E.pos], d = E.dados.get(E.pos), M = E.missao.id;
+  const infoNave = $('#info-nave');
+  const log = infoNave.querySelector('.log') || document.createElement('div');
+  log.className = 'log';
   const dadosCorpo = [
     ['tipo', c.tipo],
     ['riqueza científica', '★'.repeat(c.riqueza)],
@@ -254,13 +272,16 @@ function atualizarPaineis() {
       ['anomalias', d.anomalias],
     ] : []),
   ];
-  $('#info-corpo').innerHTML = `<div class="corpo-cabecalho"><b>${c.emoji} ${c.nome}</b></div>
-    <div class="dados-corpo">${dadosCorpo.map(([rotulo, valor]) =>
-      `<div class="dado-corpo"><span>${rotulo}</span><strong>${valor}</strong></div>`).join('')}
-      ${c.tipo === 'estacao' ? '<div class="acao-corpo"><button class="btn" data-acao="reabastecer">reabastecer tudo</button></div>' : ''}
+  $('#info-corpo').innerHTML = `<div class="corpo-imagem" role="img" aria-label="${c.nome}">${c.emoji}</div>
+    <div class="corpo-informacoes">
+      <div class="corpo-cabecalho"><b>${c.nome}</b></div>
+      <div class="dados-corpo">${dadosCorpo.map(([rotulo, valor]) =>
+        `<div class="dado-corpo"><span>${rotulo}</span><strong>${valor}</strong></div>`).join('')}
+        ${c.tipo === 'estacao' ? '<div class="acao-corpo"><button class="btn" data-acao="reabastecer">reabastecer tudo</button></div>' : ''}
+      </div>
     </div>`;
   const rot = M === 1 ? (E.fase === 0 ? 'rota mais segura' : 'rota mais curta') : M === 2 ? 'rota ótima (TSP)' : 'rota de fuga';
-  $('#info-nave').innerHTML = `<b class="nave-titulo">${E.nave.emoji} ${E.nave.nome}</b>
+  infoNave.innerHTML = `<b class="nave-titulo">${E.nave.emoji} ${E.nave.nome}</b>
     <div class="status-nave">
       <div class="linha-medidor">
         <span class="rotulo-medidor">combustível</span>
@@ -283,7 +304,7 @@ function atualizarPaineis() {
         ${barrinhas(E.entregues.size, 4, 4)}
       </div>
     </div>
-    <div class="objetivo-nave">${objetivo()}${M === 3 ? `<br>próximo colapso em <b id="cont">${E.cont}</b>s` : ''}</div>
+    <div class="objetivo-nave">${objetivo()}${M === 3 ? `<br>próximo colapso em <span class="contagem-colapso"><b id="cont">${E.cont}</b>s</span>` : ''}</div>
     <div class="nave-acoes">
       <div class="acao-nave">
         <button class="btn" data-acao="rota" aria-label="${rot}" title="${rot}"></button>
@@ -297,8 +318,9 @@ function atualizarPaineis() {
         <button class="btn" data-acao="ciclos" aria-label="ciclos / rotas" title="ciclos / rotas"></button>
         <span>ciclos / rotas</span>
       </div>
-    </div>
-    <div class="log">&gt; ${E.msgs[E.msgs.length - 1]}</div>`;
+    </div>`;
+  infoNave.appendChild(log);
+  animarLog(log, E.msgs[E.msgs.length - 1] || '', E.msgs.length - 1);
 }
 
 function desenhar() {
