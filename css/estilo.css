@@ -808,11 +808,16 @@ aside {
   }
 }
 
-.orbita text {
-  font-size: 20px;
-  text-anchor: middle;
-  dominant-baseline: central;
+.pirata-imagem-container {
   pointer-events: none;
+}
+
+.pirata-visual {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 /* ============================================================

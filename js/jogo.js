@@ -6,6 +6,7 @@ const NAVES = [
   { id: 'B', nome: 'Foguete Lumina', imagem: 'url("https://png.pngtree.com/png-clipart/20250430/original/pngtree-silver-rocket-icon-png-image_20903190.png")', c: 2, k: 2, v: 5 },
   { id: 'C', nome: 'Falcão Milenar', imagem: 'url("https://freepngimg.com/thumb/star_wars/5-2-star-wars-ship-vector-png.png")', c: 5, k: 5, v: 2 },
 ]; // c = combustível, k = carga, v = velocidade (níveis 1 a 5)
+const IMAGEM_PIRATA = 'url("https://png.pngtree.com/png-vector/20260313/ourmid/pngtree-scifi-pirate-ship-with-black-sails-in-space-realistic-photo-full-png-image_18912835.webp")';
 
 const MISSOES = [
   { id: 1, titulo: 'Viagem à Nebulosa Esmeralda', desc: 'Vá pela rota mais segura, colete os dados da nebulosa e volte à Terra pela rota mais curta.', inicio: 'terra' },
@@ -142,7 +143,7 @@ function chegar(id) {
   if (p?.tipo === 'piratas') {
     const l = Math.ceil(combMax() * 0.1 * p.nivel);
     E.combustivel = Math.max(0, E.combustivel - l); E.carga = Math.max(0, E.carga - 1);
-    msg(`☠️ Piratas! -${l} de combustível e -1 de carga.`);
+    msg(`Piratas! -${l} de combustível e -1 de carga.`);
   }
   if (p?.tipo === 'tempestade') {
     const l = Math.ceil(combMax() * 0.08);
@@ -356,7 +357,10 @@ function desenhar() {
     if (vivo && c.perigo?.tipo === 'piratas')
       s += `<g transform="translate(${c.x},${c.y})"><g class="orbita rapida"><g>
         <animateMotion path="M 34 0 A 34 34 0 1 1 -34 0 A 34 34 0 1 1 34 0" dur="2s" repeatCount="indefinite" rotate="0"/>
-        <text>☠️</text></g></g></g>`;
+        <foreignObject class="pirata-imagem-container" x="-12" y="-12" width="24" height="24">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="pirata-visual"
+            style='background-image: ${IMAGEM_PIRATA};'></div>
+        </foreignObject></g></g></g>`;
   }
   if (E.viajando) s += `<g id="nave-voo" transform="translate(${E.navePos.x},${E.navePos.y})">
     <foreignObject class="nave-imagem-container" x="-16" y="-16" width="32" height="32">
